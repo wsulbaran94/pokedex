@@ -98,4 +98,27 @@ Vite + React 19 + TypeScript (`verbatimModuleSyntax` is on, so type-only imports
 ## Git
 
 - The remote is `git@github.com:wsulbaran94/pokedex.git`. This repo uses a personal SSH key through the repo-local `core.sshCommand`, and the repo-local `user.email` is the personal gmail. The machine's default key belongs to a different (work) GitHub account, so don't change these settings.
-- Work goes on feature branches, which are merged into `main` through pull requests.
+### Branching: Gitflow (always follow)
+**Every change gets its own branch.** Never commit directly to `main` or `develop`, not even for docs or one-line fixes.
+
+| Branch | Created from | Merged into | Purpose |
+|---|---|---|---|
+| `main` | — | — | Production. Only receives `release/*` and `hotfix/*` merges; every merge is tagged `vX.Y.Z`. |
+| `develop` | `main` | — | Integration branch for the next release. |
+| `feature/<short-kebab-name>` | `develop` | `develop` | New features, refactors, docs, tooling. |
+| `bugfix/<short-kebab-name>` | `develop` | `develop` | Fixes for bugs not yet in production. |
+| `release/X.Y.Z` | `develop` | `main` **and** `develop` | Release prep only: version bump, last fixes, `CONTEXT.md` update. |
+| `hotfix/<short-kebab-name>` | `main` | `main` **and** `develop` | Urgent fixes to production. Bump the patch version. |
+
+- **Before starting any task:** run `git status` and `git branch --show-current`.
+  - If you're on `main` or `develop`, or on a branch that belongs to another task, create the right branch first. Example: `git checkout develop && git pull && git checkout -b feature/<name>`.
+  - If the working tree has uncommitted changes from something else, stop and ask.
+- **Branch names:** lowercase kebab-case that describes the change, e.g. `feature/shared-button`, `bugfix/search-spaces`, `release/1.1.0`.
+- **Commits:** small and focused, with an imperative subject line ("Add …", "Fix …").
+- **Merging:**
+  - Changes reach `develop` and `main` only through pull requests. Don't merge locally unless the user asks.
+  - After a `release/*` or `hotfix/*` merges into `main`, tag it (`vX.Y.Z`) and merge the same branch back into `develop`.
+  - Delete the branch once it's merged.
+- **Versions:** follow SemVer in `package.json`: feature releases bump MINOR, hotfixes bump PATCH, breaking changes bump MAJOR.
+- **Pushing:** push the branch with `git push -u origin <branch>` when the task is done. Never force-push to `main` or `develop`.
+- Record the branch name in the `CONTEXT.md` entry for each task.
