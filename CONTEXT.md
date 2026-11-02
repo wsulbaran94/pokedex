@@ -5,14 +5,34 @@ Running log of work on the Pokédex. Read it at the start of each session, and a
 ## Current state
 
 - **Branching follows Gitflow** (see `CLAUDE.md`). Every change gets its own branch from `develop`; `main` changes only through `release/*` and `hotfix/*`.
-- `main` and `develop` (`8da3c83`): the app with the code-review fixes, the shared `Button` and `fieldClass` styles, `CLAUDE.md` and `CONTEXT.md`. PR #1 merged `fix/code-review-findings` into `main` before Gitflow was adopted, and `develop` was fast-forwarded to match. No tag yet.
-- `feature/gitflow-branching-rule`: adds the Gitflow rule. **Pending:** a pull request into `develop`.
-- Next suggested step: after this feature merges, create `release/1.0.0` from `develop`, bump `package.json` to `1.0.0`, merge it into `main`, tag `v1.0.0`, then merge it back into `develop`.
+- `main` (`578623d`, tag **`v1.0.0`**): release 1.0.0, merged in PR #3.
+- `develop` (`5dce3f5`): **pending** the merge of `release/1.0.0` back into it (a pull request into `develop`), which brings the version bump and this log.
+- Cleanup pending: delete `release/1.0.0` after it merges back, and the already-merged `feature/gitflow-branching-rule`. Both still exist on GitHub.
+- No GitHub Release page yet: publishing it from the website didn't work (probably saved as a draft). The tag exists, so a release can be attached to `v1.0.0` from the Releases page.
 - The `gh` command-line tool isn't installed, so pull requests are opened in the browser.
 - Known open item: each grid card fetches the full `/pokemon/{name}` record just to read its types (review finding #9, skipped on purpose).
 - The app has not been tested by clicking through it in a browser. Checks so far are build, lint, curl against PokéAPI, and contrast scripts.
 
 ## Log
+
+### 2026-11-02 — Tag v1.0.0
+- **Done:**
+  - PR #3 merged `release/1.0.0` into `main` (`578623d`), done by the user.
+  - Publishing the GitHub Release didn't create a tag (probably saved as a draft), so I created the annotated tag `v1.0.0` on `578623d` and pushed it.
+- **Branch / commit:** this log entry is on `release/1.0.0`, so it reaches `develop` through the merge-back.
+- **Verified:** `git ls-remote --tags` shows `v1.0.0^{}` = `578623d` = `origin/main`.
+- **Pending / next:**
+  - Pull request `release/1.0.0` → `develop`.
+  - Delete `release/1.0.0` and `feature/gitflow-branching-rule`.
+  - Optionally publish the GitHub Release on the existing tag.
+
+### 2026-11-02 — Create release/1.0.0
+- **Done:** created `release/1.0.0` from `develop` (`5dce3f5`, which includes PR #2) and set the version to `1.0.0` in `package.json` and `package-lock.json` with `npm version --no-git-tag-version`.
+- **Branch / commit:** `release/1.0.0`, pushed.
+- **Verified:** build and lint pass. Not checked in a browser.
+- **Pending / next:**
+  - Pull request into `main`, tag `v1.0.0`, merge back into `develop`, delete the branch.
+  - Delete the merged `feature/gitflow-branching-rule` on GitHub; this was blocked here.
 
 ### 2026-11-02 — Gitflow branching rule and develop branch
 - **Done:**
