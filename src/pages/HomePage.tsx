@@ -3,12 +3,12 @@ import { useSearchParams } from 'react-router-dom'
 import { MAX_DEX_ID, idFromUrl } from '../api/pokeapi'
 import { PokemonCard } from '../components/PokemonCard'
 import { SearchBar } from '../components/SearchBar'
+import { Button } from '../components/Button'
+import { ErrorMessage } from '../components/ErrorMessage'
 import { CardSkeleton } from '../components/Skeleton'
 import { TypeFilter } from '../components/TypeFilter'
-import { useAllNames, usePokemonList, useTypeMembers } from '../hooks/usePokemon'
+import { PAGE_SIZE, useAllNames, usePokemonList, useTypeMembers } from '../hooks/usePokemon'
 import type { NamedResource } from '../types/pokemon'
-
-const PAGE_SIZE = 20
 
 export function HomePage() {
   const [params, setParams] = useSearchParams()
@@ -40,11 +40,11 @@ export function HomePage() {
 }
 
 function BrowseGrid() {
-  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = usePokemonList()
+  const { data, isLoading, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = usePokemonList()
   const pokemon =
     data?.pages.flatMap((p) => p.results).filter((p) => idFromUrl(p.url) <= MAX_DEX_ID) ?? []
 
-  if (isError) return <ErrorMessage />
+  if (isError) return <ErrorMessage onRetry={() => refetch()} />
 
   return (
     <>
@@ -65,13 +65,17 @@ function FilteredGrid({ search, type }: { search: string; type: string }) {
     let list: NamedResource[] | undefined = type ? members.data : names.data
     if (!list) return undefined
     if (search) {
+      // API names are hyphenated ("mr-mime"), but cards display them with spaces ("Mr Mime").
+      const slug = search.replace(/\s+/g, '-')
       const asNumber = search.replace(/^#?0*/, '')
-      list = list.filter((p) => p.name.includes(search) || String(idFromUrl(p.url)) === asNumber)
+      list = list.filter((p) => p.name.includes(slug) || String(idFromUrl(p.url)) === asNumber)
     }
     return list
   }, [type, search, members.data, names.data])
 
-  if (names.isError || members.isError) return <ErrorMessage />
+  if (names.isError || members.isError) {
+    return <ErrorMessage onRetry={() => (type ? members.refetch() : names.refetch())} />
+  }
   if (!results) return <Grid pokemon={[]} loading />
   if (results.length === 0) {
     return (
@@ -105,22 +109,9 @@ function Grid({ pokemon, loading }: { pokemon: NamedResource[]; loading: boolean
 function LoadMoreButton({ onClick, loading = false }: { onClick: () => void; loading?: boolean }) {
   return (
     <div className="mt-10 flex justify-center">
-      <button
-        onClick={onClick}
-        disabled={loading}
-        className="rounded-full bg-red-600 px-8 py-3 font-semibold text-white shadow-lg shadow-red-600/30 transition hover:bg-red-700 disabled:opacity-60"
-      >
+      <Button size="lg" onClick={onClick} disabled={loading}>
         {loading ? 'Loading…' : 'Load more'}
-      </button>
-    </div>
-  )
-}
-
-export function ErrorMessage() {
-  return (
-    <div className="py-24 text-center text-slate-600 dark:text-slate-400">
-      <p className="text-5xl">⚠️</p>
-      <p className="mt-4 text-lg">Something went wrong talking to PokéAPI. Please try again.</p>
+      </Button>
     </div>
   )
 }

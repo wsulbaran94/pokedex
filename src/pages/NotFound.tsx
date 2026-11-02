@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Button } from '../components/Button'
 
 export function NotFound() {
   return (
@@ -7,12 +7,9 @@ export function NotFound() {
       <p className="mt-4 text-lg text-slate-600 dark:text-slate-300">
         A wild page didn't appear. This Pokémon (or page) doesn't exist.
       </p>
-      <Link
-        to="/"
-        className="mt-8 inline-block rounded-full bg-red-600 px-6 py-3 font-semibold text-white hover:bg-red-700"
-      >
+      <Button to="/" className="mt-8">
         Back to Pokédex
-      </Link>
+      </Button>
     </div>
   )
 }

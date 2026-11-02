@@ -4,6 +4,7 @@ import { artworkUrl, idFromUrl } from '../api/pokeapi'
 import { useEvolutionChain } from '../hooks/usePokemon'
 import { capitalize } from '../lib/typeColors'
 import type { ChainLink, NamedResource } from '../types/pokemon'
+import { RetryButton } from './RetryButton'
 import { Skeleton } from './Skeleton'
 
 /** Flattens the chain into stages; each stage lists every species at that depth. */
@@ -17,11 +18,29 @@ function toStages(link: ChainLink): NamedResource[][] {
   return stages
 }
 
-export function EvolutionChain({ url, current }: { url: string | undefined; current: string }) {
-  const { data, isLoading } = useEvolutionChain(url)
+export function EvolutionChain({
+  url,
+  current,
+  speciesFailed = false,
+  onRetrySpecies,
+}: {
+  url: string | undefined
+  current: string
+  /** The species request (which provides `url`) failed, so the URL will never arrive. */
+  speciesFailed?: boolean
+  onRetrySpecies?: () => void
+}) {
+  const { data, isError, refetch } = useEvolutionChain(url)
 
-  if (isLoading || !url) return <Skeleton className="h-36 w-full" />
-  if (!data) return null
+  if (speciesFailed || isError) {
+    return (
+      <div className="flex flex-wrap items-center gap-4">
+        <p className="text-slate-600 dark:text-slate-400">Couldn't load evolution data.</p>
+        <RetryButton onClick={() => (speciesFailed ? onRetrySpecies?.() : refetch())} />
+      </div>
+    )
+  }
+  if (!data) return <Skeleton className="h-36 w-full" />
 
   const stages = toStages(data.chain)
   if (stages.length === 1) {
