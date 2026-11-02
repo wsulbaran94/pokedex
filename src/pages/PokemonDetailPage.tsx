@@ -1,25 +1,27 @@
 import { Link, useParams } from 'react-router-dom'
-import { MAX_DEX_ID } from '../api/pokeapi'
+import { MAX_DEX_ID, idFromUrl, isNotFound } from '../api/pokeapi'
+import { ErrorMessage } from '../components/ErrorMessage'
 import { EvolutionChain } from '../components/EvolutionChain'
 import { Skeleton } from '../components/Skeleton'
 import { StatBar } from '../components/StatBar'
 import { TypeBadge } from '../components/TypeBadge'
-import { usePokemon, useSpecies } from '../hooks/usePokemon'
+import { useAllNames, usePokemon, useSpecies } from '../hooks/usePokemon'
 import { badgeColors, capitalize, colorFor, darken, lighten, padId } from '../lib/typeColors'
 import { NotFound } from './NotFound'
 
 export function PokemonDetailPage() {
   const { name = '' } = useParams()
-  const { data: pokemon, isLoading, isError } = usePokemon(name.toLowerCase())
-  const { data: species } = useSpecies(pokemon?.species.name)
+  const { data: pokemon, error, refetch } = usePokemon(name.toLowerCase())
+  const speciesQuery = useSpecies(pokemon?.species.name)
+  const species = speciesQuery.data
 
-  if (isError) return <NotFound />
-  if (isLoading || !pokemon) return <DetailSkeleton />
+  if (error) return isNotFound(error) ? <NotFound /> : <ErrorMessage onRetry={() => refetch()} />
+  if (!pokemon) return <DetailSkeleton />
 
   const accent = colorFor(pokemon.types[0].type.name)
   // Hero colors meet WCAG AA; the gradient only moves *away* from the text color, so contrast never drops.
   const hero = badgeColors(pokemon.types[0].type.name)
-  const lightText = hero.fg === '#ffffff'
+  const lightText = hero.isLightText
   const heroEnd = lightText ? darken(hero.bg, 0.25) : lighten(hero.bg, 0.35)
   const artwork = pokemon.sprites.other?.['official-artwork']?.front_default ?? pokemon.sprites.front_default
   const flavor = species?.flavor_text_entries
@@ -27,6 +29,8 @@ export function PokemonDetailPage() {
     ?.flavor_text.replace(/[\f\n\r]/g, ' ')
   const genus = species?.genera.find((g) => g.language.name === 'en')?.genus
   const total = pokemon.stats.reduce((sum, s) => sum + s.base_stat, 0)
+  // National Dex number from the species, so alternate forms (e.g. charizard-mega-x, id 10034) navigate by dex order.
+  const dexId = idFromUrl(pokemon.species.url)
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -35,8 +39,8 @@ export function PokemonDetailPage() {
           ← Back to Pokédex
         </Link>
         <div className="flex gap-2">
-          {pokemon.id > 1 && <NavButton id={pokemon.id - 1} label="← Prev" />}
-          {pokemon.id < MAX_DEX_ID && <NavButton id={pokemon.id + 1} label="Next →" />}
+          {dexId > 1 && <NavButton dexId={dexId - 1} label="← Prev" />}
+          {dexId < MAX_DEX_ID && <NavButton dexId={dexId + 1} label="Next →" />}
         </div>
       </div>
 
@@ -107,17 +111,25 @@ export function PokemonDetailPage() {
 
       <div className="mt-6">
         <Panel title="Evolution chain">
-          <EvolutionChain url={species?.evolution_chain.url} current={pokemon.species.name} />
+          <EvolutionChain
+            url={species?.evolution_chain.url}
+            current={pokemon.species.name}
+            speciesFailed={speciesQuery.isError}
+            onRetrySpecies={() => speciesQuery.refetch()}
+          />
         </Panel>
       </div>
     </div>
   )
 }
 
-function NavButton({ id, label }: { id: number; label: string }) {
+function NavButton({ dexId, label }: { dexId: number; label: string }) {
+  // Link by name (same URL + cache key as cards use); fall back to the number until the name list loads.
+  const { data: names } = useAllNames()
+  const target = names?.[dexId - 1]?.name ?? dexId
   return (
     <Link
-      to={`/pokemon/${id}`}
+      to={`/pokemon/${target}`}
       className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:ring-red-500 dark:bg-slate-900 dark:text-slate-200 dark:ring-slate-700"
     >
       {label}

@@ -10,7 +10,7 @@ import {
   idFromUrl,
 } from '../api/pokeapi'
 
-const PAGE_SIZE = 20
+export const PAGE_SIZE = 20
 
 export function usePokemonList() {
   return useInfiniteQuery({

@@ -25,7 +25,8 @@ export const typeColors: Record<string, string> = {
   fairy: '#ef70ef',
 }
 
-export const colorFor = (type: string) => typeColors[type] ?? '#888'
+/** Always returns a 6-digit hex color (the contrast helpers below only parse that form). */
+export const colorFor = (type: string) => typeColors[type] ?? '#888888'
 
 const DARK_TEXT = '#0f172a'
 const LIGHT_TEXT = '#ffffff'
@@ -67,14 +68,16 @@ export const textColorFor = (bg: string) =>
  * Background + text colors for a type that meet WCAG AA (4.5:1).
  * Mid-tone colors where neither text color passes are darkened until white text does.
  */
-export function badgeColors(type: string): { bg: string; fg: string } {
-  let bg = colorFor(type)
+export function badgeColors(type: string): { bg: string; fg: string; isLightText: boolean } {
+  const base = colorFor(type)
+  let bg = base
   let fg = textColorFor(bg)
-  for (let step = 0.05; contrastRatio(bg, fg) < MIN_CONTRAST && step <= 0.6; step += 0.05) {
-    bg = darken(colorFor(type), step)
+  // Integer counter avoids float drift (0.05 * n) skipping the last step; at 100% it's black, which always passes.
+  for (let i = 1; contrastRatio(bg, fg) < MIN_CONTRAST && i <= 20; i++) {
+    bg = darken(base, i * 0.05)
     fg = LIGHT_TEXT
   }
-  return { bg, fg }
+  return { bg, fg, isLightText: fg === LIGHT_TEXT }
 }
 
 export const capitalize = (s: string) =>

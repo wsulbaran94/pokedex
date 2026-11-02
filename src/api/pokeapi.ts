@@ -12,9 +12,21 @@ const BASE_URL = 'https://pokeapi.co/api/v2'
 /** Highest National Dex number; ids above this are alternate forms. */
 export const MAX_DEX_ID = 1025
 
+export class HttpError extends Error {
+  readonly status: number
+
+  constructor(status: number) {
+    super(`Request failed (${status})`)
+    this.status = status
+  }
+}
+
+/** True only for a real "doesn't exist" response, not for network or server failures. */
+export const isNotFound = (err: unknown) => err instanceof HttpError && err.status === 404
+
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url)
-  if (!res.ok) throw new Error(`Request failed (${res.status})`)
+  if (!res.ok) throw new HttpError(res.status)
   return res.json() as Promise<T>
 }
 
