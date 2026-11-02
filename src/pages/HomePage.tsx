@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { MAX_DEX_ID, idFromUrl } from '../api/pokeapi'
 import { PokemonCard } from '../components/PokemonCard'
 import { SearchBar } from '../components/SearchBar'
+import { Button } from '../components/Button'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { CardSkeleton } from '../components/Skeleton'
 import { TypeFilter } from '../components/TypeFilter'
@@ -108,13 +109,9 @@ function Grid({ pokemon, loading }: { pokemon: NamedResource[]; loading: boolean
 function LoadMoreButton({ onClick, loading = false }: { onClick: () => void; loading?: boolean }) {
   return (
     <div className="mt-10 flex justify-center">
-      <button
-        onClick={onClick}
-        disabled={loading}
-        className="rounded-full bg-red-600 px-8 py-3 font-semibold text-white shadow-lg shadow-red-600/30 transition hover:bg-red-700 disabled:opacity-60"
-      >
+      <Button size="lg" onClick={onClick} disabled={loading}>
         {loading ? 'Loading…' : 'Load more'}
-      </button>
+      </Button>
     </div>
   )
 }

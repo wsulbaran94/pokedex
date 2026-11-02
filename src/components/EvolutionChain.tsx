@@ -4,7 +4,7 @@ import { artworkUrl, idFromUrl } from '../api/pokeapi'
 import { useEvolutionChain } from '../hooks/usePokemon'
 import { capitalize } from '../lib/typeColors'
 import type { ChainLink, NamedResource } from '../types/pokemon'
-import { RetryButton } from './ErrorMessage'
+import { RetryButton } from './RetryButton'
 import { Skeleton } from './Skeleton'
 
 /** Flattens the chain into stages; each stage lists every species at that depth. */

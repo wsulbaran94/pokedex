@@ -1,3 +1,5 @@
+import { RetryButton } from './RetryButton'
+
 export function ErrorMessage({
   message = 'Something went wrong talking to PokéAPI. Please try again.',
   onRetry,
@@ -11,17 +13,5 @@ export function ErrorMessage({
       <p className="mt-4 text-lg">{message}</p>
       {onRetry && <RetryButton onClick={onRetry} className="mt-6" />}
     </div>
-  )
-}
-
-export function RetryButton({ onClick, className = '' }: { onClick: () => void; className?: string }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full bg-red-600 px-6 py-2.5 font-semibold text-white hover:bg-red-700 ${className}`}
-    >
-      Try again
-    </button>
   )
 }
