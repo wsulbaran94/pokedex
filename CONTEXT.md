@@ -5,10 +5,9 @@ Running log of work on the Pokédex. Read it at the start of each session, and a
 ## Current state
 
 - **Branching follows Gitflow** (see `CLAUDE.md`). Every change gets its own branch from `develop`; `main` changes only through `release/*` and `hotfix/*`.
-- `main` (`41d7149`): first version of the app. No tag or release has been made yet.
-- `develop` (`17b1d28`): `main` plus the code-review fixes, the shared `Button` and `fieldClass` styles, `CLAUDE.md` and `CONTEXT.md`.
+- `main` and `develop` (`8da3c83`): the app with the code-review fixes, the shared `Button` and `fieldClass` styles, `CLAUDE.md` and `CONTEXT.md`. PR #1 merged `fix/code-review-findings` into `main` before Gitflow was adopted, and `develop` was fast-forwarded to match. No tag yet.
 - `feature/gitflow-branching-rule`: adds the Gitflow rule. **Pending:** a pull request into `develop`.
-- Next suggested step: create `release/1.0.0` from `develop`, bump `package.json` to `1.0.0`, merge it into `main`, tag `v1.0.0`, then merge it back into `develop`.
+- Next suggested step: after this feature merges, create `release/1.0.0` from `develop`, bump `package.json` to `1.0.0`, merge it into `main`, tag `v1.0.0`, then merge it back into `develop`.
 - The `gh` command-line tool isn't installed, so pull requests are opened in the browser.
 - Known open item: each grid card fetches the full `/pokemon/{name}` record just to read its types (review finding #9, skipped on purpose).
 - The app has not been tested by clicking through it in a browser. Checks so far are build, lint, curl against PokéAPI, and contrast scripts.
@@ -22,6 +21,7 @@ Running log of work on the Pokédex. Read it at the start of each session, and a
 - **Branch / commit:** `feature/gitflow-branching-rule` from `develop`, pushed.
 - **Verified:** `git ls-remote` shows `main`, `develop` and the feature branch, and no longer shows `fix/code-review-findings`.
 - **Pending / next:** pull request from `feature/gitflow-branching-rule` into `develop`. Then `release/1.0.0` to bring `develop` into `main`, tagged `v1.0.0`.
+- **Correction:** PR #1 had already merged `fix/code-review-findings` into `main` on GitHub (`8da3c83`). `develop` was fast-forwarded to `8da3c83`; the contents are unchanged.
 
 ### 2026-11-02 — Remove duplicated button and field styles
 - **Done:**
