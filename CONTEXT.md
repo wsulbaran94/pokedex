@@ -4,12 +4,24 @@ Running log of work on the Pokédex. Read it at the start of each session, and a
 
 ## Current state
 
-- `main` (`41d7149`): the full app, with the dark mode toggle and WCAG AA colors.
-- `fix/code-review-findings` (`61ab536`, pushed): code-review fixes. **Pending:** a pull request into `main`. The `gh` command-line tool isn't installed, so open it in the browser: https://github.com/wsulbaran94/pokedex/pull/new/fix/code-review-findings
+- **Branching follows Gitflow** (see `CLAUDE.md`). Every change gets its own branch from `develop`; `main` changes only through `release/*` and `hotfix/*`.
+- `main` (`41d7149`): first version of the app. No tag or release has been made yet.
+- `develop` (`17b1d28`): `main` plus the code-review fixes, the shared `Button` and `fieldClass` styles, `CLAUDE.md` and `CONTEXT.md`.
+- `feature/gitflow-branching-rule`: adds the Gitflow rule. **Pending:** a pull request into `develop`.
+- Next suggested step: create `release/1.0.0` from `develop`, bump `package.json` to `1.0.0`, merge it into `main`, tag `v1.0.0`, then merge it back into `develop`.
+- The `gh` command-line tool isn't installed, so pull requests are opened in the browser.
 - Known open item: each grid card fetches the full `/pokemon/{name}` record just to read its types (review finding #9, skipped on purpose).
 - The app has not been tested by clicking through it in a browser. Checks so far are build, lint, curl against PokéAPI, and contrast scripts.
 
 ## Log
+
+### 2026-11-02 — Gitflow branching rule and develop branch
+- **Done:**
+  - Added a "Branching: Gitflow" section to `CLAUDE.md`: a table of branch types, branch-first checks before any task, naming, merging only through pull requests, tagging releases and hotfixes and merging them back into `develop`, SemVer, and no force-pushing.
+  - Created `develop` from `fix/code-review-findings` (`17b1d28`) and pushed it, then deleted `fix/code-review-findings` locally and on GitHub. Its work now lives in `develop`.
+- **Branch / commit:** `feature/gitflow-branching-rule` from `develop`, pushed.
+- **Verified:** `git ls-remote` shows `main`, `develop` and the feature branch, and no longer shows `fix/code-review-findings`.
+- **Pending / next:** pull request from `feature/gitflow-branching-rule` into `develop`. Then `release/1.0.0` to bring `develop` into `main`, tagged `v1.0.0`.
 
 ### 2026-11-02 — Remove duplicated button and field styles
 - **Done:**
